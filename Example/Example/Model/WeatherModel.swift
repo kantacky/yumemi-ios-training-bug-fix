@@ -52,6 +52,8 @@ class WeatherModelImpl: WeatherModel {
                     }
                 }
             }
+        } else {
+            completion(.failure(WeatherError.jsonEncodeError))
         }
     }
 }
