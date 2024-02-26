@@ -14,11 +14,17 @@ class WeatherViewControllerTests: XCTestCase {
 
     var weahterViewController: WeatherViewController!
     var weahterModel: WeatherModelMock!
-    
+    var disasterModel: DisasterModelMock!
+
     override func setUpWithError() throws {
         weahterModel = WeatherModelMock()
+        disasterModel = DisasterModelMock()
+        disasterModel.fetchDisasterImpl = {
+            "只今、災害情報はありません。"
+        }
         weahterViewController = R.storyboard.weather.instantiateInitialViewController()!
         weahterViewController.weatherModel = weahterModel
+        weahterViewController.disasterModel = disasterModel
         _ = weahterViewController.view
     }
 
@@ -82,5 +88,14 @@ class WeatherModelMock: WeatherModel {
         } else {
             completion(.failure(WeatherError.unknownError))
         }
+    }
+}
+
+class DisasterModelMock: DisasterModel {
+
+    var fetchDisasterImpl: (() -> String)!
+
+    func fetchDisaster(completion: ((String) -> Void)?) {
+        completion?(fetchDisasterImpl())
     }
 }
