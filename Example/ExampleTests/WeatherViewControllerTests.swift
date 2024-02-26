@@ -31,7 +31,7 @@ class WeatherViewControllerTests: XCTestCase {
             Response(weather: .sunny, maxTemp: 0, minTemp: 0, date: Date())
         }
         
-        weahterViewController.loadWeather()
+        weahterViewController.loadWeather(nil)
         XCTAssertEqual(weahterViewController.weatherImageView.tintColor, R.color.red())
         XCTAssertEqual(weahterViewController.weatherImageView.image, R.image.sunny())
     }
@@ -41,7 +41,7 @@ class WeatherViewControllerTests: XCTestCase {
             Response(weather: .cloudy, maxTemp: 0, minTemp: 0, date: Date())
         }
         
-        weahterViewController.loadWeather()
+        weahterViewController.loadWeather(nil)
         XCTAssertEqual(weahterViewController.weatherImageView.tintColor, R.color.gray())
         XCTAssertEqual(weahterViewController.weatherImageView.image, R.image.cloudy())
     }
@@ -51,7 +51,7 @@ class WeatherViewControllerTests: XCTestCase {
             Response(weather: .rainy, maxTemp: 0, minTemp: 0, date: Date())
         }
         
-        weahterViewController.loadWeather()
+        weahterViewController.loadWeather(nil)
         XCTAssertEqual(weahterViewController.weatherImageView.tintColor, R.color.blue())
         XCTAssertEqual(weahterViewController.weatherImageView.image, R.image.rainy())
     }
@@ -61,7 +61,7 @@ class WeatherViewControllerTests: XCTestCase {
             Response(weather: .rainy, maxTemp: 100, minTemp: -100, date: Date())
         }
         
-        weahterViewController.loadWeather()
+        weahterViewController.loadWeather(nil)
         XCTAssertEqual(weahterViewController.minTempLabel.text, "-100")
         XCTAssertEqual(weahterViewController.maxTempLabel.text, "100")
     }
@@ -73,5 +73,14 @@ class WeatherModelMock: WeatherModel {
     
     func fetchWeather(_ request: Request) throws -> Response {
         return try fetchWeatherImpl(request)
+    }
+
+    func fetchWeather(at area: String, date: Date, completion: @escaping (Result<Example.Response, Example.WeatherError>) -> Void) {
+        let request = Request(area: area, date: date)
+        if let response = try? fetchWeather(request) {
+            completion(.success(response))
+        } else {
+            completion(.failure(WeatherError.unknownError))
+        }
     }
 }
