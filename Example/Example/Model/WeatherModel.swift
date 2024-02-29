@@ -41,20 +41,22 @@ class WeatherModelImpl: WeatherModel {
     
     func fetchWeather(at area: String, date: Date, completion: @escaping (Result<Response, WeatherError>) -> Void) {
         let request = Request(area: area, date: date)
-        if let requestJSON = try? jsonString(from: request) {
+        do {
+            let requestJSON = try jsonString(from: request)
             DispatchQueue.global().async {
-                if let responseJSON = try? YumemiWeather.syncFetchWeather(requestJSON) {
-                    if let response = try? self.response(from: responseJSON) {
+                do {
+                    let responseJSON = try YumemiWeather.syncFetchWeather(requestJSON)
+                    do {
+                        let response = try self.response(from: responseJSON)
                         completion(.success(response))
-                    }
-                    else {
+                    } catch {
                         completion(.failure(WeatherError.jsonDecodeError))
                     }
-                } else {
+                } catch {
                     completion(.failure(WeatherError.unknownError))
                 }
             }
-        } else {
+        } catch {
             completion(.failure(WeatherError.jsonEncodeError))
         }
     }
